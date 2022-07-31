@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ExchangeRatesController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -26,4 +27,5 @@ Route::group(['middleware' => ['cors', 'json.response']], function () {
 
 Route::middleware('auth:api')->group(function () {
     Route::delete('/logout', [AuthController::class, 'logout']);
+    Route::post('/convert', [ExchangeRatesController::class, 'convert']);
 });

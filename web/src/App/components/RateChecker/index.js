@@ -1,6 +1,32 @@
+import { useState } from 'react';
 import { Row, Col, Typography, Card, Form, Input, Select, Space, Progress, Button } from 'antd'
+import { convert } from '../../services/RateExchange';
 
 function RateChecker() {
+    const [to, setTo] = useState({currency: null, amount: 0});
+    const [from, setFrom] = useState({currency: null, amount: 0});
+
+    const handleConversion = async () => {
+        const [message, amount] = await convert({to: to.amount, from: from.amount});
+        if (message.includes('from')) {
+            setFrom({...from, amount});
+        } else {
+            setTo({...to, amount});
+        }
+    }
+
+    const validateFrom = () => {
+        return from.currency !== null;
+    }
+
+    const validateTo = () => {
+        return to.currency !== null;
+    }
+
+    const validateConversion = () => {
+        return from.currency !== null && to.currency !== null && (to.amount > 0 || from.amount > 0);
+    }
+
     return (
         <>
             <Row>
@@ -29,7 +55,10 @@ function RateChecker() {
                                                                 return option.children.toLowerCase().includes(input.toLowerCase())
                                                             else if (option.label)
                                                                 return option.label.toLowerCase().includes(input.toLowerCase())
-                                                        }}>
+                                                        }}
+                                                        onChange={currency => setTo({...to, currency})}
+                                                        value={to.currency}
+                                                        >
                                                         <Select.OptGroup label='Common'>
                                                             <Select.Option value="GBP">GBP</Select.Option>
                                                             <Select.Option value="EUR">EUR</Select.Option>
@@ -41,7 +70,7 @@ function RateChecker() {
                                                     </Select>
                                                 </Col>
                                                 <Col span={18}>
-                                                    <Input placeholder='Enter Amount' />
+                                                    <Input placeholder='Enter Amount' value={to.amount} disabled={validateTo() === false} onChange={$event => setTo({...to, amount: $event.target.value})} />
                                                 </Col>
                                             </Row>
                                         </Form.Item>
@@ -59,7 +88,10 @@ function RateChecker() {
                                                                 return option.children.toLowerCase().includes(input.toLowerCase())
                                                             else if (option.label)
                                                                 return option.label.toLowerCase().includes(input.toLowerCase())
-                                                        }}>
+                                                        }}
+                                                        onChange={currency => setFrom({...from, currency})}
+                                                        value={from.currency}
+                                                        >
                                                         <Select.OptGroup label='Common'>
                                                             <Select.Option value="GBP">GBP</Select.Option>
                                                             <Select.Option value="EUR">EUR</Select.Option>
@@ -71,7 +103,7 @@ function RateChecker() {
                                                     </Select>
                                                 </Col>
                                                 <Col span={18}>
-                                                    <Input placeholder='Enter Amount' />
+                                                    <Input placeholder='Enter Amount' disabled={validateFrom() === false} value={from.amount} onChange={$event => setFrom({...from, amount: $event.target.value})} />
                                                 </Col>
                                             </Row>
                                         </Form.Item>
@@ -88,7 +120,7 @@ function RateChecker() {
                                         </Space>
                                     </Col>
                                     <Col span={12} className='right-align-text'>
-                                        <Button type='primary' htmlType='submit'>Convert</Button>
+                                        <Button type='primary' htmlType='submit' disabled={validateConversion() === false} onClick={handleConversion}>Convert</Button>
                                     </Col>
                                 </Row>
                             </Form>
