@@ -5,6 +5,15 @@ import {
 const ENDPOINT = "http://localhost/api";
 const KEY = "_auth";
 
+export const check = () => {
+    const axios = instance(ENDPOINT);
+    return axios
+        .get('user')
+        .then((response) => {
+            return response.data;
+        });
+};
+
 export const login = ({
     email,
     password

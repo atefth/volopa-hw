@@ -3,13 +3,17 @@ import { useEffect } from 'react';
 import "./App.css";
 import WalletDashboard from "./App/pages/WalletDashboard";
 import Login from "./App/pages/Login";
-import { authContext } from './App/contexts/Auth';
-import { getCurrentUser } from "./App/services/Auth";
-import AuthContextProvider from "./App/contexts/Auth";
+import useAuth, { AuthProvider } from './App/contexts/Auth';
+import { getCurrentUser, check } from "./App/services/Auth";
+import {
+    BrowserRouter as Router,
+    Route,
+    Routes,
+    Navigate
+  } from "react-router-dom";
 
 function App() {
-    const auth = React.useContext(authContext);
-    const {user, refreshToken} = auth;
+    const {user, refreshToken} = useAuth();
 
     useEffect(() => {
         const data = getCurrentUser();
@@ -18,9 +22,22 @@ function App() {
         }
     }, []);
 
-    return <AuthContextProvider>
-        {user?.token !== null ? <WalletDashboard/> : <Login/>}
-    </AuthContextProvider>
+    useEffect(() => {
+        console.log(user)
+    }, [user]);
+
+
+    return (
+        <AuthProvider>
+            <Router>
+                <Routes>
+                    <Route path="/wallet" element={<WalletDashboard />} />
+                    <Route path="/login" element={<Login />} />
+                    <Route exact path="/" element={!user?.token ? <Navigate replace to="/login" /> : <Navigate replace to="/wallet" />} />
+                </Routes>
+            </Router>
+        </AuthProvider>
+    );
 }
 
 export default App;

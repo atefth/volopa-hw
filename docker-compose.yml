@@ -4,6 +4,9 @@ services:
     app:
         build:
             context: ./web
+        volumes:
+            - './web/:/app'
+            - '/web/node_modules'
         ports:
             - "3000:3000"
         networks:

@@ -7,7 +7,7 @@ function RateChecker() {
     const [from, setFrom] = useState({currency: null, amount: 0});
 
     const handleConversion = async () => {
-        const [message, amount] = await convert({to: to.amount, from: from.amount});
+        const [message, amount] = await convert({from, to});
         if (message.includes('from')) {
             setFrom({...from, amount});
         } else {

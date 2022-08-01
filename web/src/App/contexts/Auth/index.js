@@ -1,23 +1,41 @@
 import * as React from "react";
-import useAuthHandler from "../../hooks/Auth";
-import { getCurrentUser } from "../../services/Auth";
+import { useContext, useMemo } from "react";
+import { updateToken, clearToken } from "../../services/Auth";
 
-export const authContext = React.createContext({
+export const AuthContext = React.createContext({
   user: null,
   refreshToken: () => {},
   logout: () => {}
 });
-const { Provider } = authContext;
-const AuthContextProvider = ({
+export const AuthProvider = ({
   children
 }) => {
-  const { user, refreshToken, logout } = useAuthHandler(
-    getCurrentUser()
-  );
-return (
-    <Provider value={{ user, refreshToken, logout }}>
-      {children}
-    </Provider>
-  );
+    const [user, setUser] = React.useState(null);
+    const refreshToken = (token) => {
+        updateToken(token);
+        setUser({
+            ...user,
+            token
+        });
+    };
+    const logout = () => {
+        clearToken();
+        setUser(null);
+    };
+    const memoedValue = useMemo(
+        () => ({
+            user,
+            refreshToken,
+            logout,
+        }),
+        [user]
+    );
+    return (
+        <AuthContext.Provider value={memoedValue}>
+            {children}
+        </AuthContext.Provider>
+    );
 };
-export default AuthContextProvider;
+export default function useAuth() {
+    return useContext(AuthContext);
+}

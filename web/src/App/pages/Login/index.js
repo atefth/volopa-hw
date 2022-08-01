@@ -2,18 +2,22 @@ import * as React from "react";
 import { useState } from 'react';
 import { Button, Card, Col, Form, Input, Row, Typography } from "antd";
 import { login } from '../../services/Auth';
-import { authContext } from '../../contexts/Auth';
+import useAuth from "../../contexts/Auth";
 
 
 function Login() {
     const [credentials, setCredentials] = useState({email: '', password: ''});
-    const auth = React.useContext(authContext);
+    const {refreshToken} = useAuth();
 
     const loginUser = async () => {
-        const data = await login(credentials);
-        if (data.token) {
-            auth.refreshToken(data.token);
-            console.log(data);
+        try {
+            const data = await login(credentials);
+            if (data.token) {
+                refreshToken(data.token);
+            }
+        } catch (error) {
+            const message = error.response.data.errors.reduce((err, msg) => `${msg} \n ${err}`, '')
+            alert(message);
         }
     }
 

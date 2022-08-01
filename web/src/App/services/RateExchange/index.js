@@ -5,14 +5,16 @@ import {
 const ENDPOINT = "http://localhost/api";
 
 export const convert = ({
-    to,
-    from
+    from,
+    to
 }) => {
     const axios = instance(ENDPOINT);
     return axios
         .post('convert', {
-            to_amount: to,
-            from_amount: from
+            from_currency: from.currency,
+            from_amount: from.amount,
+            to_currency: to.currency,
+            to_amount: to.amount,
         })
         .then((response) => {
             return response.data;

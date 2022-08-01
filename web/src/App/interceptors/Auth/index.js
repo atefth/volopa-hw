@@ -11,11 +11,9 @@ export const instance = (baseURL) => {
 
     instance.interceptors.request.use(
         config => {
-            const {
-                token
-            } = getCurrentUser();
-            if (token) {
-                config.headers['Authorization'] = `Bearer ${token}`
+            const user = getCurrentUser();
+            if (user?.token) {
+                config.headers['Authorization'] = `Bearer ${user.token}`
             }
             config.headers['Content-Type'] = 'application/json';
             return config
