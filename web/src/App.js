@@ -1,42 +1,31 @@
-import * as React from "react";
-import { useEffect } from 'react';
+import React from "react";
 import "./App.css";
 import WalletDashboard from "./App/pages/WalletDashboard";
 import Login from "./App/pages/Login";
-import useAuth, { AuthProvider } from './App/contexts/Auth';
-import { getCurrentUser, check } from "./App/services/Auth";
 import {
-    BrowserRouter as Router,
     Route,
     Routes,
-    Navigate
+    useNavigate,
+    Navigate,
+    useLocation
   } from "react-router-dom";
+  import { history } from './App/helpers';
+import { PrivateRoute } from "./App/components/PrivateRoute";
 
 function App() {
-    const {user, refreshToken} = useAuth();
-
-    useEffect(() => {
-        const data = getCurrentUser();
-        if (data?.token) {
-            refreshToken(data.token);
-        }
-    }, []);
-
-    useEffect(() => {
-        console.log(user)
-    }, [user]);
-
+    history.navigate = useNavigate();
+    history.location = useLocation();
 
     return (
-        <AuthProvider>
-            <Router>
-                <Routes>
-                    <Route path="/wallet" element={<WalletDashboard />} />
-                    <Route path="/login" element={<Login />} />
-                    <Route exact path="/" element={!user?.token ? <Navigate replace to="/login" /> : <Navigate replace to="/wallet" />} />
-                </Routes>
-            </Router>
-        </AuthProvider>
+        <Routes>
+            <Route path="/wallet" element={
+                <PrivateRoute>
+                    <WalletDashboard />
+                </PrivateRoute>
+            } />
+            <Route path="/login" element={<Login />} />
+            <Route path="*" element={<Navigate to='/login' />} />
+        </Routes>
     );
 }
 

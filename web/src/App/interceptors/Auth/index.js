@@ -1,8 +1,5 @@
 import axios from 'axios';
-import {
-    getCurrentUser
-} from "../../services/Auth";
-
+import { KEY } from '../../store';
 
 export const instance = (baseURL) => {
     const instance = axios.create({
@@ -11,7 +8,7 @@ export const instance = (baseURL) => {
 
     instance.interceptors.request.use(
         config => {
-            const user = getCurrentUser();
+            const user = JSON.parse(localStorage.getItem(KEY));
             if (user?.token) {
                 config.headers['Authorization'] = `Bearer ${user.token}`
             }

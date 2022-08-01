@@ -1,25 +1,20 @@
-import * as React from "react";
-import { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button, Card, Col, Form, Input, Row, Typography } from "antd";
-import { login } from '../../services/Auth';
-import useAuth from "../../contexts/Auth";
-
+import { useDispatch, useSelector } from 'react-redux';
+import { authActions } from '../../store/Auth';
+import { history } from '../../helpers';
 
 function Login() {
     const [credentials, setCredentials] = useState({email: '', password: ''});
-    const {refreshToken} = useAuth();
+    const { auth } = useSelector(x => x);
+    const dispatch = useDispatch();
 
-    const loginUser = async () => {
-        try {
-            const data = await login(credentials);
-            if (data.token) {
-                refreshToken(data.token);
-            }
-        } catch (error) {
-            const message = error.response.data.errors.reduce((err, msg) => `${msg} \n ${err}`, '')
-            alert(message);
-        }
-    }
+    // useEffect(() => {
+    //     // redirect to wallet dashboard if already logged in
+    //     if (auth.token) {
+    //         history.navigate('/wallet');
+    //     }
+    // }, []);
 
     return (
         <Row className="full-height" align="middle" justify="center">
@@ -47,7 +42,15 @@ function Login() {
                                         name='password'>
                                         <Input.Password onChange={($event) => setCredentials({...credentials, password: $event.target.value})} />
                                     </Form.Item>
-                                    <Button type="primary" htmlType="submit" className="right-align-text" onClick={loginUser}>Login</Button>
+                                    <Button type="primary" htmlType="submit" className="right-align-text"
+                                        onClick={() => {
+                                            return dispatch(authActions.login(credentials))
+                                            .unwrap()
+                                            .then(() => {
+                                                history.navigate('/wallet');
+                                            });
+                                        }}
+                                    >Login</Button>
                                 </Form>
                             </Col>
                         </Row>

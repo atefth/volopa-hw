@@ -3,7 +3,6 @@ import {
 } from "../../interceptors/Auth";
 
 const ENDPOINT = "http://localhost/api";
-const KEY = "_auth";
 
 export const check = () => {
     const axios = instance(ENDPOINT);
@@ -26,24 +25,35 @@ export const login = ({
             password_confirmation: password
         })
         .then((response) => {
-            if (response.data.token) {
-                localStorage.setItem(KEY, JSON.stringify(response.data));
-            }
             return response.data;
+        }).catch(error => {
+            let str;
+            const {
+                message,
+                errors
+            } = error.response.data;
+            if (errors) {
+                str = errors.reduce((err, msg) => `${msg} \n ${err}`, '');
+            } else {
+                str = message
+            }
+            return Promise.reject(str);
         });
 };
 
-export const clearToken = () => {
-    localStorage.removeItem(KEY);
+export const logout = (token) => {
+    const axios = instance(ENDPOINT);
+    return axios.post('logout', null, {
+        headers: {
+            'Authorization': `Bearer ${token}`
+        }
+    });
 };
 
-export const getCurrentUser = () => {
-    return JSON.parse(localStorage.getItem(KEY));
+const AuthService = {
+    login,
+    logout,
+    check
 };
 
-export const updateToken = (token) => {
-    localStorage.setItem(KEY, JSON.stringify({
-        ...getCurrentUser(),
-        token
-    }))
-}
+export default AuthService;

@@ -26,6 +26,6 @@ Route::group(['middleware' => ['cors', 'json.response']], function () {
 });
 
 Route::middleware('auth:api')->group(function () {
-    Route::delete('/logout', [AuthController::class, 'logout']);
+    Route::post('/logout', [AuthController::class, 'logout']);
     Route::post('/convert', [ExchangeRatesController::class, 'convert']);
 });
