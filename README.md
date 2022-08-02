@@ -1,8 +1,19 @@
+## Requirements
+
+1. Docker
+2. Composer
+
 ## Instructions
 
-`composer install`
+`cp .env.example .env`
 
-`./vendon/bin/sail up -d`
+Set `DB_USERNAME` and `DB_PASSWORD` in `.env` file
+
+`composer install && cd web && npm install && cd ..`
+
+`./vendor/bin/sail up -d`
+
+`php artisan key:generate`
 
 `php artisan migrate`
 
